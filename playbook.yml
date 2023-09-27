@@ -1,0 +1,24 @@
+- hosts: webservers
+
+  tasks:
+    - name: update packages
+      ansible.builtin.dnf:
+        state: present
+        update_cache: yes
+      become: yes
+      tags: [update_packages]
+
+    - name: install packages
+      ansible.builtin.dnf:
+        name:
+          - git
+          - make
+          - nodejs
+        state: present
+      become: yes
+      tags: [install_packages]
+
+    - name: create users
+      ansible.builtin.user:
+        name: masha
+        uid: 1078
