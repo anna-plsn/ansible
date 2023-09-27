@@ -1,4 +1,7 @@
 - hosts: webservers
+  vars:
+    nginx_port: 8080
+    root_dir: /usr/share/nginx/html 
   tasks:
     - name: install nginx
       ansible.builtin.dnf:
@@ -17,7 +20,8 @@
     - name: copy html
       ansible.builtin.copy:
         src: files/index.html
-        dest: /usr/share/nginx/html/index.html
+        dest: 
+          "{{ root_dir }}/index.html"
       become: yes
 
 
