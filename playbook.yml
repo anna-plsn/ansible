@@ -1,24 +1,76 @@
-- hosts: webservers
+- hosts: all
+
+  roles:
+    - role: nginxinc.nginx
+      when: ansible_distribution == 'Ubuntu'
 
   tasks:
-    - name: update packages
+    - name: update packages CentOS
       ansible.builtin.dnf:
         state: present
         update_cache: yes
       become: yes
       tags: [update_packages]
+      when: ansible_distribution == "CentOS"
 
-    - name: install packages
+    - name: install packages CentOS
       ansible.builtin.dnf:
         name:
           - git
-          - make
-          - nodejs
         state: present
       become: yes
       tags: [install_packages]
+      when: ansible_distribution == "CentOS"
+
+    - name: update packages Ubuntu
+      ansible.builtin.apt:
+        state: present
+        update_cache: yes
+      become: yes
+      tags: [update_packages]
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: install packages Ubuntu
+      ansible.builtin.apt:
+        name:
+          - git
+        state: present
+      become: yes
+      tags: [install_packages]
+      when: ansible_distribution == 'Ubuntu'
 
     - name: create users
       ansible.builtin.user:
-        name: masha
-        uid: 1078
+        name: "{{ item }}"
+        state: present
+      loop:
+        - ilyas
+        - logger
+
+    - name: copy gitconfig
+      ansible.builtin.template:
+        src: files/.gitconfig
+        dest: "/home/{{ item }}/.gitconfig"
+      loop:
+        - ilyas
+        - logger
+
+    - name: ensures .ssh/ exists
+      file:
+        path: "/home/{{ item }}/.ssh/"
+        state: directory
+      loop:
+        - ilyas
+        - logger
+
+
+    - name: copy ssh-key
+      ansible.builtin.template:
+        src: /root/.ssh/authorized_keys
+        dest: "/home/{{ item }}/.ssh/"
+      become: yes
+      loop:
+        - ilyas
+        - logger
+
+

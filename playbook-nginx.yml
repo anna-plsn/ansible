@@ -2,12 +2,18 @@
   vars:
     nginx_port: 8080
     root_dir: /usr/share/nginx/html 
+    welcome_text: "This is server {{ server_name }}!"
   tasks:
-    - name: install nginx
+    - name: install packages
       ansible.builtin.dnf:
-        name: nginx
+        name: 
+          - nginx
+          - cowsay
         state: latest
       become: yes
+
+    - ansible.builtin.shell: cowsay "This is {{ server_name }}"
+      register: cowsay_result
 
     - name: update nginx config
       ansible.builtin.template: 
